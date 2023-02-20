@@ -13,6 +13,7 @@ class Produit extends Model
         'nom',
         'prix',
         'description',
+        'user_id',
     ];
 
     protected $hidden = [
@@ -24,6 +25,7 @@ class Produit extends Model
         'id' => 'integer',
         'nom' => 'string',
         'prix' => 'string',
+        'user_id' => 'integer',
         'description' => 'string',
     ];
 }

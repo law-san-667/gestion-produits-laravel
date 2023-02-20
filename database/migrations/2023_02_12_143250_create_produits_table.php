@@ -18,6 +18,7 @@ class CreateProduitsTable extends Migration
             $table->string('nom');
             $table->string('prix');
             $table->string('description');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }

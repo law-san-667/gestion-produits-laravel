@@ -21,6 +21,7 @@
     </style>
 </head>
 <body>
+    
 
     <form action={{$produit ?  "/updateProduit/$produit->id" : "/addProduit" }} method="post">
         @csrf
