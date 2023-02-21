@@ -110,7 +110,7 @@
             @endif
             <tr>
                 <td colspan="4">
-                    <a href="/form_add" class="add" >Add...</a>
+                    <a href="/form_add  " class="add" >Add...</a>
                 </td>
             </tr>
         </tbody>

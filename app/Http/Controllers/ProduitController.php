@@ -7,14 +7,8 @@ use App\Models\Produit;
 use App\Models\User;
 
 class ProduitController extends Controller
-{
-
+{    
     public function index()
-    {
-        header('Location: localhost:80000/listProduits');
-    }
-    
-    public function listProduits()
     {
         $produits = Produit::all();
         foreach($produits as $produit){
@@ -23,14 +17,14 @@ class ProduitController extends Controller
         return view('list_produits', ['produits' => $produits]);
     }
 
-    public function form_add()
+    public function create()
     {
         if(session('user') == null)
             return redirect('/form_login?error=You must be logged in to add a product !');
         return view('form_add', ['produit' => null]);
     }
 
-    public function addProduit(Request $request)
+    public function store(Request $request)
     {
         $produit = new Produit();
         $produit->nom = $request->nom;
@@ -41,7 +35,7 @@ class ProduitController extends Controller
         return redirect('/listProduits');
     }
 
-    public function updateProduit(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $produit = Produit::find($id);
         $produit->nom = $request->nom;
@@ -51,21 +45,21 @@ class ProduitController extends Controller
         return redirect('/listProduits');
     }
 
-    public function deleteProduit(Request $request, $id)
+    public function destroy(Request $request, $id)
     {
         $produit = Produit::find($id);
         $produit->delete();
         return redirect('/listProduits');
     }
 
-    public function form_update($id)
+    public function edit($id)
     {
         $produit = Produit::find($id);
         return view('form_add', ['produit' => $produit]);
     }
 
 
-    public function details_produit($id)
+    public function show($id)
     {
         $produit = Produit::find($id);
         $produit->user = User::find($produit->user_id);
