@@ -18,7 +18,9 @@ class CreateProduitsTable extends Migration
             $table->string('nom');
             $table->string('prix');
             $table->string('description');
-            $table->foreignId('user_id')->constrained('users');
+            $table->string('img')->nullable();
+            // cascade permet de supprimer tous les produits associés si le propriétaire est supprimé
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

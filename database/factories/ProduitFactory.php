@@ -16,6 +16,10 @@ class ProduitFactory extends Factory
         return [
             'nom' => $this->faker->name,
             'prix' => $this->faker->randomNumber(5),
+            'user_id' => $this->faker->numberBetween(0, 9999),
+            'created_at' => $this->faker->date(),
+            // 'img' => $this->k
+            'updated_at' => $this->faker->date(),
             'description' => $this->faker->text,
         ];
     }

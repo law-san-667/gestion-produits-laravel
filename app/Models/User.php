@@ -41,4 +41,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Relationship to products, créee une clé étrangère, une relation entre tes deux tables
+    public function products()
+    {
+        return $this->hasMany(Produit::class, 'user_id');
+    }
 }

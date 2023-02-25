@@ -13,19 +13,30 @@ class Produit extends Model
         'nom',
         'prix',
         'description',
-        'user_id',
+        'img',
+        'user_id'
     ];
 
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-    ];
+    public function scopeFilter($query, array $filters)
+    {
 
-    protected $casts = [
-        'id' => 'integer',
-        'nom' => 'string',
-        'prix' => 'string',
-        'user_id' => 'integer',
-        'description' => 'string',
-    ];
+        if ($filters['search'] ?? false) {
+            $query->where('nom', 'like', '%' . request('search') . '%')
+                ->orWhere('description', 'like', '%' . request('search') . '%')
+                ->orWhere('prix', 'like', '%' . request('search') . '%');
+        }
+    }
+
+    // Relationship to User, créee une clé étrangère, une relation entre tes deux tables
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getOwner(){
+        // $produits = user();
+        // foreach ($produits as $produit){
+        //     if($produit->id == )
+        // }
+    }
 }

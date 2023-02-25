@@ -2,79 +2,73 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Exception;
-use Illuminate\Database\QueryException;
+use App\Models\Produit;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
-    public function form_register()
+    // Show Register/Create form
+    public function create()
     {
-        if(isset($_GET['error'])){
-            return view('form_register', ['error' => $_GET['error']]);
+        return view('users.register');
+    }
+
+    // Create New User
+    public function store(Request $request)
+    {
+        $formFields = $request->validate([
+            'name' => ['required', 'min:3'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')],
+            'password' => 'required|confirmed|min:6'
+        ]);
+
+        // Hash Password
+        $formFields['password'] = bcrypt($formFields['password']);
+
+        // Create User
+        $user = User::create($formFields);
+
+        // Login
+        auth()->login($user);
+
+        return redirect('/')->with('message', 'Compte créee avec succès !');
+    }
+
+    // Logout User
+    public function logout(Request $request)
+    {
+        auth()->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/')->with('message', 'Vous avez été déconnecté !');
+    }
+
+    // Show Login Form
+    public function login()
+    {
+        return view('users.login');
+    }
+
+    // Authenticate User
+    public function authenticate(Request $request)
+    {
+        $formFields = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => 'required'
+        ]);
+
+        if (auth()->attempt($formFields)) {
+            $request->session()->regenerate();
+            $content = Produit::where('user_id', auth()->user()->id)->get()->count();
+            session(["nbProduits" => $content]);
+            return redirect('/')->with('message', 'Vous êtes connecté');
         }
-        return view('form_register');
+
+        return back()->withErrors(['email' => 'Informations invalides'])->onlyInput('email');
     }
-
-    public function form_login()
-    {
-        if(isset($_GET['error'])){
-            return view('form_login', ['error' => $_GET['error']]);
-        }
-        return view('form_login');
-    }
-
-    public function register(Request $request)
-    {
-        try {
-            $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->password = $request->password;
-            $user->save();
-            session(['user' => User::where('email', $request->email)->first()->id]);
-            return redirect('/listProduits');
-        } catch (QueryException $th) {
-            if($th->errorInfo[1] == 1062){
-                return redirect('/form_register?error=Account already exists !');
-            }
-            elseif($th->errorInfo[1] == 1048){
-                return redirect('/form_register?error=Please fill all the fields');
-            }
-            else{
-                return redirect('/form_register?error=Unknown error'.$th->errorInfo[1]);
-            }
-        }
-    }
-
-    public function login(Request $request)
-    {
-        try{
-            $user = User::where('email', $request->email)->first();
-            if($user == null)
-                return redirect('/form_login?error=Account does not exist !');
-            if ($user->password == $request->password) {
-                session(['user' => $user->id]);
-                return redirect('/listProduits');
-            } else {
-                return redirect('/form_login');
-            }
-        }catch(QueryException $th){
-            if($th->errorInfo[1] == 1048){
-                return redirect('/form_login?error=Please fill all the fields');
-            }
-            else{
-                return redirect('/form_login?error=Unknown error'.$th->errorInfo[1]);
-            }
-        }
-    }
-
-    public function logout()
-    {
-        session()->forget('user'); 
-        return redirect('/form_login');
-    }
-
-
 }
